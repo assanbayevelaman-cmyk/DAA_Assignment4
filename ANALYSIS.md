@@ -91,7 +91,7 @@
 |Command|Input or fixture path|Expected result|Actual result / log|What it checks|
 |---|---|---|---|---|
 |lcs|`AGGTAB/GXTXAYB`|length 4|PASS|non-contiguous match|
-|merge|`[10,20,30,40,50]`|cost 340, 4 merges|PASS|chronological plan|
+|merge|`[10,20,30,40,50]`|cost 330, 4 merges|PASS|chronological plan|
 |tree|5-node, weights `[3,2,5,10,7]`|optimal non-adjacent set|PASS|take/skip|
 |naive|`mississippi/issi`|`[1,4]`|PASS|overlaps|
 |kmp|`mississippi/issi`|`[1,4]`|PASS|matches naive|
