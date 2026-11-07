@@ -87,7 +87,9 @@
 
 ## Own tests
 
+
 |Command|Input or fixture path|Expected result|Actual result / log|What it checks|
+|---|---|---|---|---|
 |lcs|`AGGTAB/GXTXAYB`|length 4|PASS|non-contiguous match|
 |merge|`[10,20,30,40,50]`|cost 340, 4 merges|PASS|chronological plan|
 |tree|5-node, weights `[3,2,5,10,7]`|optimal non-adjacent set|PASS|take/skip|
@@ -104,6 +106,7 @@
 Use the same inputs for naive/KMP/RK. At three increasing sizes in the common domain (n, m≤3000), measure random and repetitive cases separately. Record generator/seed, n, m, pattern distribution and correctness verification first. At least three measured runs per algorithm/size/case; report raw times, unit and median. Exclude compilation; give the identical timing scope, warm-up/JIT policy and commands.
 
 |Case|n|m|Seed/generator|Algorithm|Run 1|Run 2|Run 3|Median|Correct outputs checked|
+|---|---:|---:|---|---|---:|---:|---:|---:|---|
 |random|500|50|`Random(42)`|naive|0|0|0|0|yes|
 |random|500|50|`Random(42)`|kmp|0|0|0|0|yes|
 |random|500|50|`Random(42)`|rk|0|0|0|0|yes|
