@@ -8,7 +8,7 @@
   ```sh
   python tools/run.py --language Java --setup
   python tools/run.py --language Java --check
-
+  ```
 ## Algorithm explanations
 
 **lcs**
@@ -34,7 +34,7 @@
 - **Transition/base.** Leaf: `take[u]=w[u]`, `skip[u]=0`. For each child `v`: `take[u]=w[u]+Σ skip[v]`, `skip[u]=Σ max(skip[v], take[v])`.
 - **Order.** Postorder from an iterative DFS; children resolved before parent. Iterative stack avoids overflow on 100 000-deep chains.
 - **Correctness.** Any optimal independent set either contains `u` (children forbidden -> `take`) or not (children free -> `skip`). Max of the two at the root is the global optimum; root choice is irrelevant (undirected tree).
-- **Reconstruction/ties.** BFS from root: take `u` iff `!parentTaken[u] && take[u] >= skip[u]`, propogate `parentTaken` to children. Empty set allowed -> all-negative returns 0, `[]`.
+- **Reconstruction/ties.** BFS from root: take `u` iff `!parentTaken[u] && take[u] >= skip[u]`, propagate `parentTaken` to children. Empty set allowed -> all-negative returns 0, `[]`.
 - **Time/memory.** `O(n)` time and memory; adjacency `List<List<Integer>>`.
 - **Boundary test.** 3-chain `[-4,-1,-5]` must give `weight=0, selected=[]`. Catches a forced-take DP.
 
@@ -63,7 +63,7 @@
 - **Correctness.** Equal hash is a candidate only. `charsMatch` verifies before recording. So false positives cannot leak into the output.
 - **Reconstruction/ties.** N/A.
 - **Time/memory.** `O(n+m+c*m)` where `c` is the number of equal-hash windows; worst case `O(nm)`. `O(1)` auxiliary.
-- **Boundary test.** `abdj/ab` -> `[0]`; `dj` hashes to 75 but is rejected by verification. Detects missing candidate varification.
+- **Boundary test.** `abdj/ab` -> `[0]`; `dj` hashes to 75 but is rejected by verification. Detects missing candidate verification.
 - **Note on modulus.** Mod 101 is a collision laboratory; production hashes use large primes or 64-bit unsigned and random bases, and do not claim deterministic linear time.
 
 **suffix**
@@ -78,7 +78,7 @@
 
 **aho**
 - **State/invariant.** Trie over 95 printable ASCII characters; `fail[u]` = longest proper suffix of the trie path at `u` that is also a trie state. `terminalIds[u]` = all pattern ids ending at `u` (duplicates share `u`).
-- **Transition/base.** Build trie; BFS failure links (root children point to 0). Per text: walk the automaton, `visits[state]++` at every character; then reverse topo order of the reverse-failure tree - for each `u`, `visits[u] += Σ visits[v]` over `v` whose `fail[v]=u`. This sums every suffix pattern occurence along `fail`.
+- **Transition/base.** Build trie; BFS failure links (root children point to 0). Per text: walk the automaton, `visits[state]++` at every character; then reverse topo order of the reverse-failure tree - for each `u`, `visits[u] += Σ visits[v]` over `v` whose `fail[v]=u`. This sums every suffix pattern occurrence along `fail`.
 - **Order.** BFS for failure links; reverse BFS order for propagation.
 - **Correctness.** After propagation, `visits[u]` = number of text positions at which the prefix matching `u` ends or whose failure chain reaches `u` - exactly the suffix-pattern count. Duplicates get equal counts because they share `u`; state is reset per text.
 - **Reconstruction/ties.** N/A. Output rows follow `texts` order, columns follow dictionary order.
@@ -88,17 +88,43 @@
 ## Own tests
 
 |Command|Input or fixture path|Expected result|Actual result / log|What it checks|
-|---|---|---|---|---|
+|lcs|`AGGTAB/GXTXAYB`|length 4|PASS|non-contiguous match|
+|merge|`[10,20,30,40,50]`|cost 340, 4 merges|PASS|chronological plan|
+|tree|5-node, weights `[3,2,5,10,7]`|optimal non-adjacent set|PASS|take/skip|
+|naive|`mississippi/issi`|`[1,4]`|PASS|overlaps|
+|kmp|`mississippi/issi`|`[1,4]`|PASS|matches naive|
+|rk|`abracadabra/abra`|`[0,7]`|PASS|rolling window|
+|rk|`abdj/ab`|`[0]`|PASS|known collision `dj` rejected|
+|suffix|`mississippi`|`len(sa)=len(lcp)=11`, `repeated="issi"`|PASS|no sentinel|
+|aho|7-pattern dict on `abccab`|`[2,1,1,1,1,1,0]`|PASS|suffix links|
+|aho|same dict, text `babcaa`|fresh row, same columns|PASS|per-text reset|
 
 ## Search comparison
 
 Use the same inputs for naive/KMP/RK. At three increasing sizes in the common domain (n, m≤3000), measure random and repetitive cases separately. Record generator/seed, n, m, pattern distribution and correctness verification first. At least three measured runs per algorithm/size/case; report raw times, unit and median. Exclude compilation; give the identical timing scope, warm-up/JIT policy and commands.
 
 |Case|n|m|Seed/generator|Algorithm|Run 1|Run 2|Run 3|Median|Correct outputs checked|
-|---|---:|---:|---|---|---:|---:|---:|---:|---|
+|random|500|50|`Random(42)`|naive|0|0|0|0|yes|
+|random|500|50|`Random(42)`|kmp|0|0|0|0|yes|
+|random|500|50|`Random(42)`|rk|0|0|0|0|yes|
+|random|1500|150|`Random(42)`|naive|0|0|1|0|yes|
+|random|1500|150|`Random(42)`|kmp|0|0|0|0|yes|
+|random|1500|150|`Random(42)`|rk|0|0|0|0|yes|
+|random|3000|300|`Random(42)`|naive|0|8|0|0|yes|
+|random|3000|300|`Random(42)`|kmp|0|0|0|0|yes|
+|random|3000|300|`Random(42)`|rk|0|0|0|0|yes|
+|repetitive|500|50|`"a"*n, "a"*m`|naive|2|1|0|1|yes|
+|repetitive|500|50|`"a"*n, "a"*m`|kmp|0|0|0|0|yes|
+|repetitive|500|50|`"a"*n, "a"*m`|rk|0|1|1|1|yes|
+|repetitive|1500|150|`"a"*n, "a"*m`|naive|6|1|1|1|yes|
+|repetitive|1500|150|`"a"*n, "a"*m`|kmp|0|0|0|0|yes|
+|repetitive|1500|150|`"a"*n, "a"*m`|rk|10|1|2|2|yes|
+|repetitive|3000|300|`"a"*n, "a"*m`|naive|2|3|3|3|yes|
+|repetitive|3000|300|`"a"*n, "a"*m`|kmp|0|0|0|0|yes|
+|repetitive|3000|300|`"a"*n, "a"*m`|rk|5|7|9|7|yes|
 
 Explain observations without treating measured times as a proof of asymptotic complexity. Discuss how the deliberately small modulus affects RK; do not generalize it to every production hash implementation. Add the known collision case as a correctness test.
 
 ## Sources and AI assistance
 
-List tools/sources, contribution and your own verification. State if none were used.
+AI was used for explaining the assignment, debugging the code, analysis.
