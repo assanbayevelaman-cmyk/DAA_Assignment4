@@ -1,0 +1,8 @@
+{"task":"lcs","a":"AGGTAB","b":"GXTXAYB"}
+{"task":"merge","sizes":[10,20,30,40,50]}
+{"task":"tree","n":5,"weights":[3,2,5,10,7],"edges":[[0,1],[0,2],[1,3],[1,4]]}
+{"task":"naive","text":"mississippi","pattern":"issi"}
+{"task":"kmp","text":"mississippi","pattern":"issi"}
+{"task":"rk","text":"abracadabra","pattern":"abra"}
+{"task":"suffix","text":"mississippi"}
+{"task":"aho","patterns":["a","ab","bab","bc","bca","c","caa"],"texts":["abccab","babcaa"]}
